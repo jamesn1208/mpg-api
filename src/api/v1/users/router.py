@@ -9,27 +9,36 @@ router = APIRouter(prefix='/users',
                    tags=['Users'])
 
 
+async def set_auth_cookie(response: Response, token: str) -> None:
+    """
+    Sets the X-Auth-Token cookie to the provided value.
+
+    :param response: Response object to apply the cookie to.
+    :param token: The token value to set the cookie to.
+    :return: Nothing.
+    """
+    response.set_cookie(key='X-Auth-Token',
+                        value=token,
+                        httponly=True,
+                        samesite='strict',
+                        expires=2628000)  # 1 month
+
+
 @router.post('/login', status_code=200)
 async def login(user: schemas.UserAuth, session: DB_SESSION, response: Response) -> schemas.User:
     data = await service.login(user=user,
                                session=session)
     # Set auth cookie
-    response.set_cookie(key='X-Auth-Token',
-                        value=data.token,
-                        httponly=True,
-                        samesite='strict',
-                        expires=2628000)  # 1 month
+    await set_auth_cookie(token=data.token,
+                          response=response)
     return data
 
 
 @router.post('/logout')
 async def logout(user_id: USER_ID, session: DB_SESSION, response: Response) -> ActionResponse:
     # Clear auth cookie
-    response.set_cookie(key='X-Auth-Token',
-                        value="",
-                        httponly=True,
-                        samesite='strict',
-                        expires=2628000)  # 1 month
+    await set_auth_cookie(token="",
+                          response=response)
     return await service.logout(user_id=user_id,
                                 session=session)
 
@@ -39,22 +48,16 @@ async def create_user(user: schemas.UserAuth, session: DB_SESSION, response: Res
     data = await service.create_user(user=user,
                                      session=session)
     # Set auth cookie
-    response.set_cookie(key='X-Auth-Token',
-                        value=data.token,
-                        httponly=True,
-                        samesite='strict',
-                        expires=2628000)  # 1 month
+    await set_auth_cookie(token=data.token,
+                          response=response)
     return data
 
 
 @router.delete('/{user_id}')
 async def delete_user(user_id: int, session: DB_SESSION, _: USER_ID, response: Response) -> ActionResponse:
     # Clear auth cookie
-    response.set_cookie(key='X-Auth-Token',
-                        value="",
-                        httponly=True,
-                        samesite='strict',
-                        expires=2628000)  # 1 month
+    await set_auth_cookie(token="",
+                          response=response)
     return await service.delete_user(user_id=user_id,
                                      session=session)
 

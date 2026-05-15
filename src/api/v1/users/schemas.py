@@ -13,6 +13,6 @@ class UserUpdate(BaseModel):
 
 
 class User(BaseModel):
-    username: str
     id: int
+    username: str
     token: str
