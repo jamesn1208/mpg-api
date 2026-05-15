@@ -1,13 +1,11 @@
 from fastapi import APIRouter
-import logging
 
-from api.core.deps.database import DB_SESSION
-from . import service
+from api.core.schemas import NotYetImplemented
 
 router = APIRouter(prefix='/metrics',
                    tags=['Metrics'])
 
 
-@router.get('')
-async def get_metrics(session: DB_SESSION):
-    return await service.get_metrics(session)
+@router.get('', status_code=501)
+async def get_metrics() -> NotYetImplemented:
+    raise NotImplementedError()

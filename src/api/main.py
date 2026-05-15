@@ -7,7 +7,7 @@ from sys import stdout
 import logging
 
 from api.core.router import router
-from api.core import config, models
+from api.core import config, models, handlers
 
 
 logging.basicConfig(level=config.LOGGING_LEVEL,
@@ -16,7 +16,7 @@ logging.basicConfig(level=config.LOGGING_LEVEL,
 
 
 @asynccontextmanager
-async def lifespan(_: FastAPI):
+async def lifespan(app: FastAPI):
     app.state.database = config.get_session_maker()
     engine = app.state.database.kw["bind"]
     if engine is None:
@@ -30,16 +30,18 @@ async def lifespan(_: FastAPI):
 
 
 pyproject = loads(open(f"{environ['WORKDIR']}/pyproject.toml").read())
-app = FastAPI(
+APP = FastAPI(
     title="Fuel API",
     description=pyproject['project']['description'],
     version=pyproject['project']['version'],
-    lifespan=lifespan
+    lifespan=lifespan,
+    swagger_ui_parameters={"defaultModelsExpandDepth": -1}
 )
 
-app.include_router(router)
+handlers.register(APP)
+APP.include_router(router)
 
 if __name__ == "__main__":
-    run(host=config.API_HOST,
-        port=config.API_PORT,
-        app=app)
+    run("api.main:APP",
+        host=config.API_HOST,
+        port=config.API_PORT)

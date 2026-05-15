@@ -5,6 +5,7 @@ description = "API service to feed fuel data to the frontend"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "argon2-cffi>=25.1.0",
     "fastapi>=0.136.1",
     "psycopg[binary]>=3.3.4",
     "requests>=2.34.2",
