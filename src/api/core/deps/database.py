@@ -10,6 +10,7 @@ def get_session(request: Request) -> Session:
     try:
         with request.app.state.database() as session:
             yield session
+            session.commit()
     except SQLAlchemyError:
         logging.exception("Failed whilst interacting with database session.")
         raise

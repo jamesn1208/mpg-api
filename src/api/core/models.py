@@ -39,20 +39,6 @@ class Vehicles(Base):
     mpg_logs = relationship('MPGLog', back_populates='vehicle')
 
 
-class Stations(Base):
-    __tablename__ = 'Stations'
-
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
-    updated_on = Column(DateTime, nullable=False, server_default=text('CURRENT_TIMESTAMP'))
-    brand = Column(String(200), nullable=True)
-    name = Column(String(1000), nullable=True)
-    emissions = Column(Numeric(10, 0), nullable=True)
-    colour = Column(String(30), nullable=True)
-
-    vehicle_ownerships = relationship('VehicleOwnership', back_populates='vehicle')
-    mpg_logs = relationship('MPGLog', back_populates='vehicle')
-
-
 class VehicleOwnership(Base):
     __tablename__ = 'VehicleOwnership'
 
