@@ -3,15 +3,25 @@ from uvicorn import run
 from fastapi import FastAPI
 from os import environ
 from toml import loads
+from sys import stdout
+import logging
 
 from api.core.router import router
+from api.core import config
+
+
+logging.basicConfig(level=config.LOGGING_LEVEL,
+                    format=config.LOGGING_FORMAT,
+                    stream=stdout)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
-    print("Hello from fuel-api!")
+async def lifespan(_: FastAPI):
+    app.state.database = config.get_database()
 
     yield
+
+    del app.state.database
 
 
 pyproject = loads(open(f"{environ['WORKDIR']}/pyproject.toml").read())
@@ -25,6 +35,6 @@ app = FastAPI(
 app.include_router(router)
 
 if __name__ == "__main__":
-    run(host="0.0.0.0",
-        port=8080,
+    run(host=config.API_HOST,
+        port=config.API_PORT,
         app=app)
