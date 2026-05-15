@@ -29,7 +29,7 @@ services:
     networks:
       - api-network
     volumes:
-      - ./db_data:/var/lib/postgresql/data
+      - ./db_data:/var/lib/postgresql/data:rw
 
 networks:
   api-network:

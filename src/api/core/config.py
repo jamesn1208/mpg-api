@@ -17,14 +17,16 @@ DB_USER = environ["POSTGRES_USER"]
 DB_PASSWORD = environ["POSTGRES_PASSWORD"]
 
 
-def get_database() -> sessionmaker:
+def get_session_maker() -> sessionmaker:
     engine = create_engine(url=f"postgresql+psycopg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}",
                            pool_size=10,
                            max_overflow=20,
                            pool_timeout=30,
-                           echo=ENVIRONMENT == "DEV")
+                           echo=ENVIRONMENT == "DEV",
+                           pool_pre_ping=True)
 
-    return sessionmaker(bind=engine)
+    return sessionmaker(bind=engine,
+                        expire_on_commit=False)
 
 
 API_PORT = int(environ.get("API_PORT", 8080))

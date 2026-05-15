@@ -7,7 +7,7 @@ from sys import stdout
 import logging
 
 from api.core.router import router
-from api.core import config
+from api.core import config, models
 
 
 logging.basicConfig(level=config.LOGGING_LEVEL,
@@ -17,10 +17,15 @@ logging.basicConfig(level=config.LOGGING_LEVEL,
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    app.state.database = config.get_database()
+    app.state.database = config.get_session_maker()
+    engine = app.state.database.kw["bind"]
+    if engine is None:
+        raise RuntimeError("Database engine is not configured properly.")
+    models.Base.metadata.create_all(engine)
 
     yield
 
+    app.state.database.kw["bind"].dispose()
     del app.state.database
 
 
