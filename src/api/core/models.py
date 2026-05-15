@@ -12,7 +12,7 @@ class Users(Base):
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     name = Column(String(30), nullable=False, unique=True)
-    session_token = Column(String(255), nullable=False, unique=True)
+    session_token = Column(String(255), nullable=True, unique=True)
     hash = Column(String(255), nullable=False)
     updated_on = Column(
         DateTime,

@@ -1,5 +1,4 @@
 import logging
-
 from fastapi import Request, Depends
 from typing import Annotated
 from sqlalchemy.exc import SQLAlchemyError

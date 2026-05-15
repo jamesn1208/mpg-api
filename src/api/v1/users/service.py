@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from fastapi.responses import JSONResponse
 from argon2 import PasswordHasher
 from uuid import uuid4
 from asyncio import to_thread
@@ -45,7 +46,64 @@ async def login(user: schemas.UserAuth, session: Session) -> schemas.User:
     ph.verify(hash=db_user.hash,
               password=user.password)
 
+    # Check if we have a session token already
+    if db_user.session_token is None:
+        # Generate a new token
+        token = str(uuid4())
+        db_user.session_token = token
+        session.flush()
+
     # Respond
     return schemas.User(id=db_user.id,
                         username=db_user.name,
                         token=db_user.session_token)
+
+
+async def logout(user_id: int, session: Session) -> JSONResponse:
+    # Remove session token
+    await to_thread(models.remove_session_token,
+                    user_id=user_id,
+                    session=session)
+
+    # Respond
+    return JSONResponse(status_code=200,
+                        content={"message": "Successfully logged out."})
+
+
+async def delete_user(user_id: int, session: Session) -> JSONResponse:
+    # Remove user from database
+    await to_thread(models.delete_user,
+                    user_id=user_id,
+                    session=session)
+
+    # Respond
+    return JSONResponse(status_code=200,
+                        content={"message": "Successfully deleted user."})
+
+
+async def update_user(user_id: int, user: schemas.UserUpdate, session: Session) -> JSONResponse:
+    # Check at least one field is being updated
+    if user.username is None and user.password is None:
+        return JSONResponse(status_code=400,
+                            content={"message": "At least one field must be updated."})
+
+    if user.username is not None:
+        # Update username
+        await to_thread(models.update_user_username,
+                        user_id=user_id,
+                        new_username=user.username,
+                        session=session)
+
+    if user.password is not None:
+        # Update password hash
+        ph = PasswordHasher()
+
+        hashed_password = ph.hash(user.password)
+        await to_thread(models.update_user_password,
+                        user_id=user_id,
+                        new_password_hash=hashed_password,
+                        session=session)
+
+    # Respond
+    return JSONResponse(status_code=200,
+                        content={"message": "Successfully updated user."})

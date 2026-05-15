@@ -8,3 +8,11 @@ class UsernameTaken(FuelAPIBase):
 
 class UnknownAccount(FuelAPIBase):
     pass
+
+
+class NoAuth(FuelAPIBase):
+    pass
+
+
+class Unauthenticated(FuelAPIBase):
+    pass
