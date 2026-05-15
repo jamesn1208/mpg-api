@@ -4,6 +4,8 @@ from fastapi import FastAPI
 from os import environ
 from toml import loads
 
+from api.core.router import router
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -19,6 +21,8 @@ app = FastAPI(
     version=pyproject['project']['version'],
     lifespan=lifespan
 )
+
+app.include_router(router)
 
 if __name__ == "__main__":
     run(host="0.0.0.0",
