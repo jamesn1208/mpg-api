@@ -12,9 +12,9 @@ LOGGING_FORMAT = "%(levelname)s: %(asctime)s | [%(funcName)s() ln%(lineno)d] : %
 # Throw KeyError if these are not present
 DB_HOST = environ["DB_HOST"]
 DB_PORT = environ["DB_PORT"]
-DB_NAME = environ["DB_NAME"]
-DB_USER = environ["DB_USER"]
-DB_PASSWORD = environ["DB_PASSWORD"]
+DB_NAME = environ["POSTGRES_DB"]
+DB_USER = environ["POSTGRES_USER"]
+DB_PASSWORD = environ["POSTGRES_PASSWORD"]
 
 
 def get_database() -> sessionmaker:

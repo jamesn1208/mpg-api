@@ -11,3 +11,6 @@ wheels/
 **.venv/
 **.lock
 env/secrets.env
+
+# Test data
+db_data/

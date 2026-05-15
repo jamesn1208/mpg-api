@@ -13,4 +13,24 @@ services:
     env_file:
       - env/secrets.env
       - env/config.env
-#    entrypoint: sleep infinity
+    networks:
+      - api-network
+    depends_on:
+      - database
+
+  database:
+    image: postgres:alpine
+    restart: "unless-stopped"
+    env_file:
+      - env/secrets.env
+      - env/config.env
+    ports:
+      - "5433:5432"
+    networks:
+      - api-network
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+
+networks:
+  api-network:
+    driver: bridge
