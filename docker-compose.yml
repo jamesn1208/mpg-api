@@ -1,0 +1,13 @@
+name: fuel-service
+
+services:
+  api:
+    build:
+      context: src/
+      dockerfile: Dockerfile
+      network: host
+    image: fuel-service/api:latest
+    ports:
+      - "8080:8080"
+    restart: "unless-stopped"
+#    entrypoint: sleep infinity
