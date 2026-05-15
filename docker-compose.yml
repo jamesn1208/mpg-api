@@ -12,4 +12,5 @@ services:
     restart: "unless-stopped"
     env_file:
       - env/secrets.env
+      - env/config.env
 #    entrypoint: sleep infinity
