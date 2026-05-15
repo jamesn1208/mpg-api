@@ -1,18 +1,12 @@
 from fastapi import APIRouter, Response
-from fastapi.responses import JSONResponse
-import logging
 
 from . import service, schemas
 from api.core.deps.database import DB_SESSION
 from api.core.deps.auth import USER_ID
+from api.core.schemas import ActionResponse
 
 router = APIRouter(prefix='/users',
                    tags=['Users'])
-
-
-@router.get('/{user_id}')
-async def get_user(user_id: int):
-    return [{'station_a': 1.5, 'station_b': 1.6}]
 
 
 @router.post('/login', status_code=200)
@@ -29,7 +23,7 @@ async def login(user: schemas.UserAuth, session: DB_SESSION, response: Response)
 
 
 @router.post('/logout')
-async def logout(user_id: USER_ID, session: DB_SESSION, response: Response) -> JSONResponse:
+async def logout(user_id: USER_ID, session: DB_SESSION, response: Response) -> ActionResponse:
     # Clear auth cookie
     response.set_cookie(key='X-Auth-Token',
                         value="",
@@ -54,7 +48,7 @@ async def create_user(user: schemas.UserAuth, session: DB_SESSION, response: Res
 
 
 @router.delete('/{user_id}')
-async def delete_user(user_id: int, session: DB_SESSION, _: USER_ID, response: Response) -> JSONResponse:
+async def delete_user(user_id: int, session: DB_SESSION, _: USER_ID, response: Response) -> ActionResponse:
     # Clear auth cookie
     response.set_cookie(key='X-Auth-Token',
                         value="",
@@ -66,7 +60,7 @@ async def delete_user(user_id: int, session: DB_SESSION, _: USER_ID, response: R
 
 
 @router.patch('/{user_id}')
-async def update_user(user_id: int, user: schemas.UserUpdate, session: DB_SESSION, _: USER_ID) -> JSONResponse:
+async def update_user(user_id: int, user: schemas.UserUpdate, session: DB_SESSION, _: USER_ID) -> ActionResponse:
     return await service.update_user(user_id=user_id,
                                      user=user,
                                      session=session)

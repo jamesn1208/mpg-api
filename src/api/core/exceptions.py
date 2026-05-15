@@ -16,3 +16,7 @@ class NoAuth(FuelAPIBase):
 
 class Unauthenticated(FuelAPIBase):
     pass
+
+
+class NoAction(FuelAPIBase):
+    pass

@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
-from fastapi.responses import JSONResponse
 from argon2 import PasswordHasher
 from uuid import uuid4
 from asyncio import to_thread
 
 from . import schemas, models
-from api.core.exceptions import UsernameTaken
+from api.core.exceptions import UsernameTaken, NoAction
+from api.core.schemas import ActionResponse
 
 
 async def create_user(user: schemas.UserAuth, session: Session) -> schemas.User:
@@ -59,33 +59,32 @@ async def login(user: schemas.UserAuth, session: Session) -> schemas.User:
                         token=db_user.session_token)
 
 
-async def logout(user_id: int, session: Session) -> JSONResponse:
+async def logout(user_id: int, session: Session) -> ActionResponse:
     # Remove session token
     await to_thread(models.remove_session_token,
                     user_id=user_id,
                     session=session)
 
     # Respond
-    return JSONResponse(status_code=200,
-                        content={"message": "Successfully logged out."})
+    return ActionResponse(success=True,
+                          message="Successfully logged out.")
 
 
-async def delete_user(user_id: int, session: Session) -> JSONResponse:
+async def delete_user(user_id: int, session: Session) -> ActionResponse:
     # Remove user from database
     await to_thread(models.delete_user,
                     user_id=user_id,
                     session=session)
 
     # Respond
-    return JSONResponse(status_code=200,
-                        content={"message": "Successfully deleted user."})
+    return ActionResponse(success=True,
+                          message="Successfully deleted user.")
 
 
-async def update_user(user_id: int, user: schemas.UserUpdate, session: Session) -> JSONResponse:
+async def update_user(user_id: int, user: schemas.UserUpdate, session: Session) -> ActionResponse:
     # Check at least one field is being updated
     if user.username is None and user.password is None:
-        return JSONResponse(status_code=400,
-                            content={"message": "At least one field must be updated."})
+        raise NoAction()
 
     if user.username is not None:
         # Update username
@@ -105,5 +104,5 @@ async def update_user(user_id: int, user: schemas.UserUpdate, session: Session) 
                         session=session)
 
     # Respond
-    return JSONResponse(status_code=200,
-                        content={"message": "Successfully updated user."})
+    return ActionResponse(success=True,
+                          message="Successfully updated user.")
