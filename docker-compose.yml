@@ -29,7 +29,7 @@ services:
     networks:
       - api-network
     volumes:
-      - ./db_data:/var/lib/postgresql/data:rw
+      - ./db_data:/var/lib/postgresql/18/docker
 
 networks:
   api-network:
