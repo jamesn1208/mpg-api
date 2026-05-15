@@ -9,4 +9,3 @@ v1_router = APIRouter(prefix='/v1')
 v1_router.include_router(prices_router)
 v1_router.include_router(stations_router)
 v1_router.include_router(metrics_router)
-
