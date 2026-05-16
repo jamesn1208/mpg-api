@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 from argon2.exceptions import VerifyMismatchError
 
-from api.core.exceptions import UsernameTaken, UnknownAccount, NoAuth, Unauthenticated, NoAction
+from api.core.exceptions import UsernameTaken, UnknownAccount, NoAuth, Unauthenticated, NoAction, ActionError
 
 
 def register(app: FastAPI) -> None:
@@ -15,12 +15,21 @@ def register(app: FastAPI) -> None:
     app.add_exception_handler(NoAuth, handle_no_auth)
     app.add_exception_handler(Unauthenticated, handle_unauthenticated)
     app.add_exception_handler(NoAction, handle_no_action)
+    app.add_exception_handler(ActionError, handle_action_error)
 
 
 async def handle_not_implemented_exception(request: Request, exc: NotImplementedError) -> JSONResponse:
     return JSONResponse(
         status_code=501,
         content={"message": "This feature is not implemented yet.",
+                 "status": False},
+    )
+
+
+async def handle_action_error(request: Request, exc: ActionError) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"message": str(exc),
                  "status": False},
     )
 
